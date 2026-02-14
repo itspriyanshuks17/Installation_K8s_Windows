@@ -1,135 +1,249 @@
-# Installing Kubernetes (kubectl) and Minikube on Windows Using Chocolatey
+# Installing Kubernetes (kubectl) and Minikube on Windows, Ubuntu, and macOS
 
-This guide provides step-by-step instructions to install `kubectl` and `minikube` on Windows using Chocolatey.
+This guide provides step-by-step instructions to install `kubectl` and `minikube` on **Windows**, **Ubuntu (Linux)**, and **macOS**.
 
-## Prerequisites
+---
 
-1. Ensure you have [Chocolatey](https://chocolatey.org/install) installed on your system.
-   - If not installed, follow the [official installation guide](https://chocolatey.org/install).
+## 🪟 Windows (Using Chocolatey)
 
-2. Verify that your system meets the following requirements:
-   - Windows 7 or later.
-   - PowerShell or Command Prompt with administrative privileges.
+### Prerequisites
 
-## Installing `kubectl`
+* Windows 7 or later
+* PowerShell or Command Prompt (Run as Administrator)
+* Chocolatey installed
+  👉 [https://chocolatey.org/install](https://chocolatey.org/install)
 
-1. **Open Command Prompt or PowerShell with Administrative Privileges**
+---
 
-   To install `kubectl`, you need to run commands as an administrator.
+### Install `kubectl`
 
-2. **Install `kubectl` Using Chocolatey**
+```sh
+choco install kubernetes-cli
+```
 
-   Run the following command to install the Kubernetes command-line tool:
+Verify:
 
-   ```sh
-   choco install kubernetes-cli
-   ```
+```sh
+kubectl version --client
+```
 
-3. **Verify the Installation**
+Update:
 
-   After the installation is complete, verify the `kubectl` version to ensure it has been installed correctly:
+```sh
+choco upgrade kubernetes-cli
+```
 
-   ```sh
-   kubectl version --client
-   ```
+---
 
-   You should see output similar to the following:
+### Install Minikube
 
-   ```
-   Client Version: vX.X.X
-   ```
+```sh
+choco install minikube
+```
 
-4. **Update `kubectl` (Optional)**
+Verify:
 
-   To update `kubectl` to the latest version in the future, use the following command:
+```sh
+minikube version
+```
 
-   ```sh
-   choco upgrade kubernetes-cli
-   ```
+Start cluster:
 
-## Installing Minikube
+```sh
+minikube start
+```
 
-Minikube is a tool that lets you run Kubernetes locally. You can install it using Chocolatey.
-
-1. **Install Minikube Using Chocolatey**
-
-   Run the following command to install Minikube:
-
-   ```sh
-   choco install minikube
-   ```
-
-2. **Verify the Installation**
-
-   After the installation is complete, verify the `minikube` version:
-
-   ```sh
-   minikube version
-   ```
-
-   You should see output similar to the following:
-
-   ```
-   minikube version: vX.X.X
-   ```
-
-3. **Start a Minikube Cluster**
-
-   To start a local Kubernetes cluster, run:
-
-   ```sh
-   minikube start
-   ```
-
-   Minikube will download the necessary Kubernetes components and start a single-node cluster.
-
-4. **Interact with the Cluster**
-
-   Use `kubectl` to interact with the cluster:
-
-   ```sh
-   kubectl get nodes
-   ```
-
-## Updating Minikube (Optional)
-
-To update Minikube to the latest version, use the following command:
+Update:
 
 ```sh
 choco upgrade minikube
 ```
 
-## Additional Configuration
+---
 
-- **Add Tools to PATH:**
-  Chocolatey automatically adds `kubectl` and `minikube` to the system PATH. If you encounter any issues, manually check the PATH settings to ensure the installation directory is included.
+## 🐧 Ubuntu (Linux)
 
-- **Set up Kubernetes Cluster Access:**
-  After installing `kubectl`, you need a Kubernetes cluster to connect to. Configure your `kubeconfig` file, typically located at `~/.kube/config`, to access your cluster.
+### Prerequisites
 
-## Uninstalling Tools
+* Ubuntu 20.04+
+* sudo privileges
+* `curl` installed
+* A driver: Docker / VirtualBox / KVM
 
-If you want to remove `kubectl` or `minikube` from your system, run:
+---
 
-- Uninstall `kubectl`:
+### Install `kubectl`
+
+```sh
+sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt update
+sudo apt install -y kubectl
+```
+
+Verify:
+
+```sh
+kubectl version --client
+```
+
+---
+
+### Install Minikube
+
+```sh
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+```
+
+Verify:
+
+```sh
+minikube version
+```
+
+Start cluster:
+
+```sh
+minikube start
+```
+
+Using Docker driver (recommended):
+
+```sh
+minikube start --driver=docker
+```
+
+---
+
+## 🍎 macOS
+
+### Prerequisites
+
+* macOS 11+
+* Homebrew installed
+  👉 [https://brew.sh](https://brew.sh)
+* Docker Desktop or another VM driver
+
+---
+
+### Install `kubectl`
+
+```sh
+brew install kubectl
+```
+
+Verify:
+
+```sh
+kubectl version --client
+```
+
+---
+
+### Install Minikube
+
+```sh
+brew install minikube
+```
+
+Verify:
+
+```sh
+minikube version
+```
+
+Start cluster:
+
+```sh
+minikube start
+```
+
+With Docker driver:
+
+```sh
+minikube start --driver=docker
+```
+
+---
+
+## 🔧 Verify Cluster (All OS)
+
+```sh
+kubectl get nodes
+```
+
+---
+
+## 🔄 Updating
+
+**Windows**
+
+```sh
+choco upgrade kubernetes-cli
+choco upgrade minikube
+```
+
+**Ubuntu**
+
+```sh
+sudo apt update && sudo apt upgrade kubectl
+```
+
+**macOS**
+
+```sh
+brew upgrade kubectl
+brew upgrade minikube
+```
+
+---
+
+## 🧹 Uninstall
+
+**Windows**
+
+```sh
+choco uninstall kubernetes-cli
+choco uninstall minikube
+```
+
+**Ubuntu**
+
+```sh
+sudo apt remove kubectl
+sudo rm /usr/local/bin/minikube
+```
+
+**macOS**
+
+```sh
+brew uninstall kubectl
+brew uninstall minikube
+```
+
+---
+
+## 🛠 Troubleshooting
+
+* If Minikube won’t start:
 
   ```sh
-  choco uninstall kubernetes-cli
+  minikube delete
+  minikube start --driver=docker
   ```
-
-- Uninstall `minikube`:
+* Check cluster:
 
   ```sh
-  choco uninstall minikube
+  kubectl cluster-info
   ```
+* Check context:
 
-## Troubleshooting
-
-- If the `kubectl` or `minikube` commands are not recognized, ensure the installation directory is included in your system PATH.
-- Check the official [kubectl installation guide](https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/) and [Minikube documentation](https://minikube.sigs.k8s.io/docs/start/) for additional help.
-
-## Resources
-
-- [Kubernetes Official Documentation](https://kubernetes.io/docs/)
-- [Minikube Official Documentation](https://minikube.sigs.k8s.io/docs/)
-- [Chocolatey Documentation](https://chocolatey.org/docs)
+  ```sh
+  kubectl config current-context
+  ```
