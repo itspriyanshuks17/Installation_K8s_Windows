@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# Kubernetes + Docker Setup Script for Fedora
+
+set -e
+
+echo "======================================="
+echo " Updating Fedora System"
+echo "======================================="
+sudo dnf update -y
+
+echo "======================================="
+echo " Installing Required Packages"
+echo "======================================="
+sudo dnf install -y \
+    curl \
+    wget \
+    git \
+    conntrack
+
+echo "======================================="
+echo " Installing DNF Plugins"
+echo "======================================="
+sudo dnf install -y dnf-plugins-core
+
+echo "======================================="
+echo " Adding Docker Repository"
+echo "======================================="
+sudo dnf config-manager addrepo \
+    --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+
+echo "======================================="
+echo " Installing Docker"
+echo "======================================="
+sudo dnf install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-compose-plugin
+
+echo "======================================="
+echo " Starting Docker Service"
+echo "======================================="
+sudo systemctl enable --now docker
+
+echo "======================================="
+echo " Adding User to Docker Group"
+echo "======================================="
+sudo usermod -aG docker $USER
+
+echo "======================================="
+echo " Installing kubectl"
+echo "======================================="
+
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://pkgs.k8s.io/core:/stable:/v1.30/rpm/
+enabled=1
+gpgcheck=1
+gpgkey=https://pkgs.k8s.io/core:/stable:/v1.30/rpm/repodata/repomd.xml.key
+EOF
+
+sudo dnf install -y kubectl
+
+echo "======================================="
+echo " Installing Minikube"
+echo "======================================="
+
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+rm -f minikube-linux-amd64
+
+echo "======================================="
+echo " Starting Minikube Cluster"
+echo "======================================="
+
+minikube start --driver=docker
+
+echo "======================================="
+echo " Kubernetes Cluster Status"
+echo "======================================="
+
+kubectl get nodes
+
+echo "======================================="
+echo " Installation Complete!"
+echo "======================================="
+
+echo "Run the following command after reboot/login:"
+echo "newgrp docker"
+
+echo ""
+echo "Useful Commands:"
+echo "minikube dashboard"
+echo "kubectl get pods -A"
+echo "kubectl get nodes"
